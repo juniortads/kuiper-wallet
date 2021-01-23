@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package pb;
+
+service Transaction {
+  rpc CreateTransaction (CreateTransactionRequest) returns (CreateTransactionResponse) {}
+}
+
+message CreateTransactionRequest {
+  string id = 1;
+  string notes = 2;
+  string account_id = 3;
+  string tracking_id = 4;
+  TransactionValue transactionValue = 5;
+}
+
+message CreateTransactionResponse {
+  string id = 1;
+}
+
+message TransactionValue {
+  string currency = 1;
+  double amount = 2;
+}

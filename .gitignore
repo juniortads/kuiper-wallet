@@ -13,3 +13,6 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+.idea/kuiper-wallet.iml
+.idea/modules.xml
+.idea/vcs.xml
