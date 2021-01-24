@@ -4,10 +4,10 @@ import (
 	"context"
 	"github.com/go-kit/kit/log"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
-	oldcontext "golang.org/x/net/context"
 	"github.com/juniortads/kuiper-wallet/services/transaction"
 	"github.com/juniortads/kuiper-wallet/services/transaction/transport"
 	"github.com/juniortads/kuiper-wallet/services/transaction/transport/pb"
+	oldcontext "golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

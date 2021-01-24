@@ -6,11 +6,13 @@ import (
 )
 
 type Transaction struct {
-	ID, Notes        string
-	TransactionValue Value
-	AccountID        string
-	TrackingID       string
-	AccountingID     string
+	ID		         string `ion:"id"`
+	Notes            string `ion:"notes"`
+	TransactionValue Value  `ion:"transactionValue"`
+	AccountID        string `ion:"accountID"`
+	TrackingID       string `ion:"trackingID"`
+	AccountingID     string `ion:"accountingID"`
+	MetadataID		 string `ion:"metadataID"`
 }
 
 type Value struct {
@@ -19,5 +21,5 @@ type Value struct {
 }
 
 type Repository interface {
-	CreateTransaction(ctx context.Context, transaction Transaction) error
+	CreateTransaction(ctx context.Context, transaction Transaction) (interface{}, error)
 }

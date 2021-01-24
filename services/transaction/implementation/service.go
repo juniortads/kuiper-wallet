@@ -22,13 +22,16 @@ func NewService(rep transaction.Repository, logger log.Logger) *service {
 
 func (s *service) CreateTransaction(ctx context.Context, transaction transaction.Transaction) (string, error) {
 	logger := log.With(s.logger, "method", "CreateTransaction")
-	uuid := ksuid.New()
-	id := uuid.String()
-	transaction.ID = id
+	transaction.ID = ksuid.New().String()
 
-	if err := s.repository.CreateTransaction(ctx, transaction); err != nil {
+	//TODO: refactoring accounting id by account
+	transaction.AccountingID = ksuid.New().String()
+
+	resp, err := s.repository.CreateTransaction(ctx, transaction)
+
+	if err != nil {
 		level.Error(logger).Log("err", err)
 		return err.Error(),err
 	}
-	return id, nil
+	return resp.(string), nil
 }

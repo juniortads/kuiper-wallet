@@ -2,6 +2,7 @@ package qldb
 
 import (
 	"context"
+	"github.com/amzn/ion-go/ion"
 	"github.com/awslabs/amazon-qldb-driver-go/qldbdriver"
 	"github.com/go-kit/kit/log"
 	"github.com/juniortads/kuiper-wallet/services/transaction"
@@ -13,40 +14,75 @@ type repository struct {
 }
 
 func New(db *qldbdriver.QLDBDriver, logger log.Logger) (*repository, error) {
-
 	return &repository{
 		db:     db,
 		logger: log.With(logger, "rep", "amazonqldb"),
 	}, nil
 }
 
-func (repo *repository) CreateTransaction(ctx context.Context, transaction transaction.Transaction) error {
-	_, err := repo.db.Execute(context.Background(), func(txn qldbdriver.Transaction) (interface{}, error){
-		result, err := txn.Execute("SELECT * FROM WalletTransaction WHERE TrackingID = ?", transaction.TrackingID)
-
+func (repo *repository) CreateTransaction(ctx context.Context, transact transaction.Transaction) (interface{}, error) {
+	resp, err := repo.db.Execute(context.Background(), func(txn qldbdriver.Transaction) (interface{}, error){
+		result, err := repo.checkIfThereIsTransactionByTrackingId(txn, transact.TrackingID)
 		if err != nil {
 			return nil, err
 		}
-		if result.Next(txn) {
-			// Document already exists, no need to insert
-		}else {
-			transaction := map[string]interface{}{
-				"ID": transaction.ID,
-				"TrackingID": transaction.TrackingID,
-				"TransactionValue": transaction.TransactionValue,
-				"AccountID": transaction.AccountID,
-				"Notes": transaction.Notes,
-			}
-			_, err = txn.Execute("INSERT INTO WalletTransaction ?", transaction)
+		if result != "" {
+			return result, nil
+		} else {
+			resp, err := repo.addTransaction(txn, transact)
 			if err != nil {
 				return nil, err
 			}
+			err = repo.updateMetadataId(txn, resp, transact.ID)
+			if err != nil {
+				return nil, err
+			}
+			return transact.ID, nil
 		}
-		return nil, nil
 	})
 
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (repo *repository) addTransaction(txn qldbdriver.Transaction, transact transaction.Transaction) (interface{}, error) {
+	resp, err := txn.Execute("INSERT INTO WalletTransaction ?", transact)
+	for resp.Next(txn) {
+		var decoded map[string]interface{}
+		err = ion.Unmarshal(resp.GetCurrentData(), &decoded)
+		if err != nil {
+			return nil, err
+		}
+
+		return decoded["documentId"], nil
+	}
+	return nil, err
+}
+
+func (repo *repository) updateMetadataId(txn qldbdriver.Transaction, documentId interface{}, transactionId string) error {
+	_, err := txn.Execute("UPDATE WalletTransaction SET metadataID = ? WHERE id = ?", documentId, transactionId)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (repo *repository) checkIfThereIsTransactionByTrackingId(txn qldbdriver.Transaction, trackingId string)(string, error)  {
+	result, err := txn.Execute("SELECT * FROM WalletTransaction WHERE trackingID = ?", trackingId)
+
+	if err != nil {
+		return "", err
+	}
+	if result.Next(txn) {
+		ionBinary := result.GetCurrentData()
+		temp := new(transaction.Transaction)
+		err = ion.Unmarshal(ionBinary, temp)
+		if err != nil {
+			return "", err
+		}
+		return temp.ID, nil
+	}
+	return "", err
 }
