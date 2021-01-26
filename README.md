@@ -1,12 +1,12 @@
-<img src="images/kuiper.png" align="left">
+<img src="images/kuiper.png">
 
 <hr>
 
-# Kuiper wallet
+
+
+## Kuiper Wallet
 
 This app is aimed at providing a complete processing to financial ledger application.
-
-
 
 ## Architecture Overview
 
