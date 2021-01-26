@@ -1,0 +1,4 @@
+package implementation
+
+func NewService()  {
+}
