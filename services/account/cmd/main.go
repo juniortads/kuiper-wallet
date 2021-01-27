@@ -13,7 +13,7 @@ func main()  {
 		logger = log.NewSyncLogger(logger)
 		logger = level.NewFilter(logger, level.AllowDebug())
 		logger = log.With(logger,
-			"svc", "transaction",
+			"svc", "account",
 			"ts", log.DefaultTimestampUTC,
 			"clr", log.DefaultCaller,
 		)
