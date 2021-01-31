@@ -12,6 +12,7 @@ message CreateTransactionRequest {
   string account_id = 3;
   string tracking_id = 4;
   TransactionValue transactionValue = 5;
+  TransactionType transactionType = 6;
 }
 
 message CreateTransactionResponse {
@@ -20,5 +21,11 @@ message CreateTransactionResponse {
 
 message TransactionValue {
   string currency = 1;
-  double amount = 2;
+  string amount = 2;
+}
+
+enum TransactionType {
+  UNKNOWN_STATUS_TYPE = 0;
+  CASHOUT = 1;
+  CASHIN = 2;
 }

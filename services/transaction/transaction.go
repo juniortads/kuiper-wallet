@@ -2,7 +2,7 @@ package transaction
 
 import (
 	"context"
-	"github.com/shopspring/decimal"
+	"github.com/amzn/ion-go/ion"
 )
 
 type Transaction struct {
@@ -13,11 +13,12 @@ type Transaction struct {
 	TrackingID       string `ion:"trackingID"`
 	AccountingID     string `ion:"accountingID"`
 	MetadataID		 string `ion:"metadataID"`
+	TransactionType  string `ion:"transactionType"`
 }
 
 type Value struct {
-	Currency string
-	Amount decimal.Decimal
+	Currency string `ion:"currency"`
+	Amount *ion.Decimal `ion:"amount"`
 }
 
 type Repository interface {

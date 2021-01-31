@@ -10,6 +10,8 @@ import (
 	oldcontext "golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"github.com/amzn/ion-go/ion"
+	"github.com/shopspring/decimal"
 )
 type grpcServer struct {
 	createTransaction kitgrpc.Handler
@@ -38,16 +40,24 @@ func (s *grpcServer) CreateTransaction(ctx oldcontext.Context, req *pb.CreateTra
 
 func decodeCreateCustomerRequest(_ context.Context, request interface{}) (interface{}, error) {
 	req := request.(*pb.CreateTransactionRequest)
+
+	_, err := decimal.NewFromString(req.TransactionValue.Amount)
+
+	if err != nil {
+		return nil, err
+	}
+
 	return transport.CreateTransactionRequest{
 		Transaction: transaction.Transaction{
 			ID:               req.Id,
 			Notes:            req.Notes,
 			TransactionValue: transaction.Value{
 				Currency: req.TransactionValue.Currency,
-				//Amount:   req.TransactionValue.Amount,
+				Amount: ion.MustParseDecimal(req.TransactionValue.Amount),
 			},
 			AccountID:        req.AccountId,
 			TrackingID:       req.TrackingId,
+			TransactionType:  req.TransactionType.String(),
 		},
 	}, nil
 }
