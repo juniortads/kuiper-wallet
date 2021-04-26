@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package pb;
+
+service Account {
+  rpc CreateAccount (CreateAccountRequest) returns (CreateAccountResponse) {}
+}
+
+message CreateAccountRequest {
+  string name = 1;
+  string tracking_id = 2;
+  string external_id = 3;
+  string document_number = 4;
+  string company_id = 5;
+  string ballast_account_id = 6;
+}
+
+message CreateAccountResponse {
+  string id = 1;
+}

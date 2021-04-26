@@ -6,6 +6,7 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/juniortads/kuiper-wallet/services/transaction"
 	"github.com/segmentio/ksuid"
+	"time"
 )
 
 type service struct {
@@ -23,9 +24,7 @@ func NewService(rep transaction.Repository, logger log.Logger) *service {
 func (s *service) CreateTransaction(ctx context.Context, transaction transaction.Transaction) (string, error) {
 	logger := log.With(s.logger, "method", "CreateTransaction")
 	transaction.ID = ksuid.New().String()
-
-	//TODO: refactoring accounting id by account
-	transaction.AccountingID = ksuid.New().String()
+	transaction.CreationDateTime = time.Now()
 
 	resp, err := s.repository.CreateTransaction(ctx, transaction)
 

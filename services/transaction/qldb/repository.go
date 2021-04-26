@@ -22,7 +22,7 @@ func New(db *qldbdriver.QLDBDriver, logger log.Logger) (*repository, error) {
 
 func (repo *repository) CreateTransaction(ctx context.Context, transact transaction.Transaction) (interface{}, error) {
 	resp, err := repo.db.Execute(context.Background(), func(txn qldbdriver.Transaction) (interface{}, error){
-		result, err := repo.checkIfThereIsTransactionByTrackingId(txn, transact.TrackingID)
+		result, err := repo.checkIfThereIsTransactionByTrackingId(txn, transact.TrackingId)
 		if err != nil {
 			return nil, err
 		}
@@ -33,11 +33,11 @@ func (repo *repository) CreateTransaction(ctx context.Context, transact transact
 			if err != nil {
 				return nil, err
 			}
-			err = repo.updateMetadataId(txn, resp, transact.ID)
+			err = repo.updateMetadataId(txn, resp, transact.Id)
 			if err != nil {
 				return nil, err
 			}
-			return transact.ID, nil
+			return transact.Id, nil
 		}
 	})
 
@@ -82,7 +82,7 @@ func (repo *repository) checkIfThereIsTransactionByTrackingId(txn qldbdriver.Tra
 		if err != nil {
 			return "", err
 		}
-		return temp.ID, nil
+		return temp.Id, nil
 	}
 	return "", err
 }

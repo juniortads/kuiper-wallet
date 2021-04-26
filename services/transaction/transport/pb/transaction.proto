@@ -7,12 +7,12 @@ service Transaction {
 }
 
 message CreateTransactionRequest {
-  string id = 1;
-  string notes = 2;
-  string account_id = 3;
-  string tracking_id = 4;
-  TransactionValue transactionValue = 5;
-  TransactionType transactionType = 6;
+  string notes = 1;
+  string account_id = 2;
+  string tracking_id = 3;
+  TransactionValue transaction_value = 4;
+  TransactionType transaction_type = 5;
+  DestinationHolder destination_holder = 6;
 }
 
 message CreateTransactionResponse {
@@ -24,8 +24,15 @@ message TransactionValue {
   string amount = 2;
 }
 
+message DestinationHolder {
+  string name = 1;
+  string document_number = 2;
+  string account_id = 3;
+}
+
 enum TransactionType {
   UNKNOWN_STATUS_TYPE = 0;
   CASHOUT = 1;
   CASHIN = 2;
+  P2P = 3;
 }
