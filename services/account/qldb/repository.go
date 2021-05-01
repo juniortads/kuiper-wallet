@@ -33,7 +33,7 @@ func (repo *repository) CreateAccount(ctx context.Context, acc account.Account) 
 			if err != nil {
 				return nil, err
 			}
-			err = repo.updateMetadataId(txn, "Account", resp, acc.Id)
+			err = repo.updateMetadataId(txn, "Account","Id", resp, acc.Id)
 			if err != nil {
 				return nil, err
 			}
@@ -41,12 +41,11 @@ func (repo *repository) CreateAccount(ctx context.Context, acc account.Account) 
 				Balance:    ion.MustParseDecimal("0"),
 				AccountId:  acc.Id,
 				Currency:   "",
-				MetadataId: "",
 			})
 			if err != nil {
 				return nil, err
 			}
-			err = repo.updateMetadataId(txn, "AvailableBalance", respAvailableBalance, acc.Id)
+			err = repo.updateMetadataId(txn, "AvailableBalance","AccountId", respAvailableBalance, acc.Id)
 			if err != nil {
 				return nil, err
 			}
@@ -75,7 +74,7 @@ func (repo *repository) addAvailableBalance(txn qldbdriver.Transaction, availabl
 }
 
 func (repo *repository) checkIfThereIsAccountByTrackingId(txn qldbdriver.Transaction, trackingId string)(string, error)  {
-	result, err := txn.Execute("SELECT * FROM Account WHERE trackingID = ?", trackingId)
+	result, err := txn.Execute("SELECT * FROM Account WHERE TrackingId = ?", trackingId)
 
 	if err != nil {
 		return "", err
@@ -106,8 +105,8 @@ func (repo *repository) addAccount(txn qldbdriver.Transaction, acc interface{}) 
 	return nil, err
 }
 
-func (repo *repository) updateMetadataId(txn qldbdriver.Transaction, table string, documentId interface{}, accountId string) error {
-	_, err := txn.Execute("UPDATE "+table+" SET metadataID = ? WHERE id = ?", documentId, accountId)
+func (repo *repository) updateMetadataId(txn qldbdriver.Transaction, table string, identifier string, documentId interface{}, accountId string) error {
+	_, err := txn.Execute("UPDATE "+table+" SET MetadataId = ? WHERE "+identifier+" = ?", documentId, accountId)
 	if err != nil {
 		return err
 	}

@@ -29,10 +29,9 @@ func NewService(rep account.Repository, logger log.Logger) *service {
 
 func (s *service) CreateAccount(ctx context.Context, account account.Account) (string, error) {
 	logger := log.With(s.logger, "method", "CreateAccount")
-	account.ID = ksuid.New().String()
+	account.Id = ksuid.New().String()
 	account.CreationDateTime = time.Now()
 	account.State = Ok
-	//account.Balance = ion.MustParseDecimal("0")
 
 	resp, err := s.repository.CreateAccount(ctx, account)
 
