@@ -5,7 +5,6 @@ import (
 	"github.com/amzn/ion-go/ion"
 	"github.com/go-kit/kit/log"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
-	"github.com/juniortads/kuiper-wallet/services/account"
 	"github.com/juniortads/kuiper-wallet/services/transaction"
 	"github.com/juniortads/kuiper-wallet/services/transaction/transport"
 	"github.com/juniortads/kuiper-wallet/services/transaction/transport/pb"
@@ -55,15 +54,9 @@ func decodeCreateTransactionRequest(_ context.Context, request interface{}) (int
 				Currency: req.TransactionValue.Currency,
 				Amount: ion.MustParseDecimal(req.TransactionValue.Amount),
 			},
-			SourceAccount: account.Account{
-				ID:               req.AccountId,
-			},
-			DestinationHolder: account.Account{
-				ID:               req.DestinationHolder.AccountId,
-				DocumentNumber: req.DestinationHolder.DocumentNumber,
-				Name: req.DestinationHolder.Name,
-			},
-			TrackingID:       req.TrackingId,
+			SourceAccountId: req.AccountId,
+			DestinationHolder: req.DestinationHolder.AccountId,
+			TrackingId:       req.TrackingId,
 			TransactionType:  req.TransactionType.String(),
 		},
 	}, nil

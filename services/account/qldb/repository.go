@@ -33,14 +33,14 @@ func (repo *repository) CreateAccount(ctx context.Context, acc account.Account) 
 			if err != nil {
 				return nil, err
 			}
-			err = repo.updateMetadataId(txn, "Account","Id", resp, acc.Id)
+			err = repo.updateMetadataId(txn, "Accounts","Id", resp, acc.Id)
 			if err != nil {
 				return nil, err
 			}
 			respAvailableBalance, err := repo.addAvailableBalance(txn, account.AvailableBalance{
 				Balance:    ion.MustParseDecimal("0"),
 				AccountId:  acc.Id,
-				Currency:   "",
+				Currency:   "BRL",
 			})
 			if err != nil {
 				return nil, err
@@ -74,7 +74,7 @@ func (repo *repository) addAvailableBalance(txn qldbdriver.Transaction, availabl
 }
 
 func (repo *repository) checkIfThereIsAccountByTrackingId(txn qldbdriver.Transaction, trackingId string)(string, error)  {
-	result, err := txn.Execute("SELECT * FROM Account WHERE TrackingId = ?", trackingId)
+	result, err := txn.Execute("SELECT * FROM Accounts WHERE TrackingId = ?", trackingId)
 
 	if err != nil {
 		return "", err
@@ -92,7 +92,7 @@ func (repo *repository) checkIfThereIsAccountByTrackingId(txn qldbdriver.Transac
 }
 
 func (repo *repository) addAccount(txn qldbdriver.Transaction, acc interface{}) (interface{}, error) {
-	resp, err := txn.Execute("INSERT INTO Account ?", acc)
+	resp, err := txn.Execute("INSERT INTO Accounts ?", acc)
 	for resp.Next(txn) {
 		var decoded map[string]interface{}
 		err = ion.Unmarshal(resp.GetCurrentData(), &decoded)

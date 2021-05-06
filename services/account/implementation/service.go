@@ -30,7 +30,7 @@ func NewService(rep account.Repository, logger log.Logger) *service {
 func (s *service) CreateAccount(ctx context.Context, account account.Account) (string, error) {
 	logger := log.With(s.logger, "method", "CreateAccount")
 	account.Id = ksuid.New().String()
-	account.CreationDateTime = time.Now()
+	account.CreationDate = time.Now().String()
 	account.State = Ok
 
 	resp, err := s.repository.CreateAccount(ctx, account)

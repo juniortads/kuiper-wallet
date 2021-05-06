@@ -48,7 +48,7 @@ func (repo *repository) CreateTransaction(ctx context.Context, transact transact
 }
 
 func (repo *repository) addTransaction(txn qldbdriver.Transaction, transact transaction.Transaction) (interface{}, error) {
-	resp, err := txn.Execute("INSERT INTO WalletTransaction ?", transact)
+	resp, err := txn.Execute("INSERT INTO Transactions ?", transact)
 	for resp.Next(txn) {
 		var decoded map[string]interface{}
 		err = ion.Unmarshal(resp.GetCurrentData(), &decoded)
@@ -62,7 +62,7 @@ func (repo *repository) addTransaction(txn qldbdriver.Transaction, transact tran
 }
 
 func (repo *repository) updateMetadataId(txn qldbdriver.Transaction, documentId interface{}, transactionId string) error {
-	_, err := txn.Execute("UPDATE WalletTransaction SET metadataID = ? WHERE id = ?", documentId, transactionId)
+	_, err := txn.Execute("UPDATE Transactions SET metadataID = ? WHERE id = ?", documentId, transactionId)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (repo *repository) updateMetadataId(txn qldbdriver.Transaction, documentId 
 }
 
 func (repo *repository) checkIfThereIsTransactionByTrackingId(txn qldbdriver.Transaction, trackingId string)(string, error)  {
-	result, err := txn.Execute("SELECT * FROM WalletTransaction WHERE trackingID = ?", trackingId)
+	result, err := txn.Execute("SELECT * FROM Transactions WHERE trackingID = ?", trackingId)
 
 	if err != nil {
 		return "", err

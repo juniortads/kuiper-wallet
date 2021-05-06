@@ -3,7 +3,6 @@ package account
 import (
 	"context"
 	"github.com/amzn/ion-go/ion"
-	"time"
 )
 
 type Account struct {
@@ -16,7 +15,7 @@ type Account struct {
 	BallastAccountId string          `ion:"BallastAccountId"`
 	MetadataId       string          `ion:"MetadataId"`
 	State            string          `ion:"State"`
-	CreationDateTime time.Time       `ion:"CreationDateTime" type:"timestamp"`
+	CreationDate     string          `ion:"CreationDate"`
 
 }
 type AvailableBalance struct {
