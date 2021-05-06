@@ -22,7 +22,7 @@ func New(db *qldbdriver.QLDBDriver, logger log.Logger) (*repository, error) {
 
 func (repo *repository) CreateTransaction(ctx context.Context, transact transaction.Transaction) (interface{}, error) {
 	resp, err := repo.db.Execute(context.Background(), func(txn qldbdriver.Transaction) (interface{}, error){
-		result, err := repo.checkIfThereIsTransactionByTrackingId(txn, transact.TrackingID)
+		result, err := repo.checkIfThereIsTransactionByTrackingId(txn, transact.TrackingId)
 		if err != nil {
 			return nil, err
 		}
@@ -33,11 +33,11 @@ func (repo *repository) CreateTransaction(ctx context.Context, transact transact
 			if err != nil {
 				return nil, err
 			}
-			err = repo.updateMetadataId(txn, resp, transact.ID)
+			err = repo.updateMetadataId(txn, resp, transact.Id)
 			if err != nil {
 				return nil, err
 			}
-			return transact.ID, nil
+			return transact.Id, nil
 		}
 	})
 
@@ -48,7 +48,7 @@ func (repo *repository) CreateTransaction(ctx context.Context, transact transact
 }
 
 func (repo *repository) addTransaction(txn qldbdriver.Transaction, transact transaction.Transaction) (interface{}, error) {
-	resp, err := txn.Execute("INSERT INTO WalletTransaction ?", transact)
+	resp, err := txn.Execute("INSERT INTO Transactions ?", transact)
 	for resp.Next(txn) {
 		var decoded map[string]interface{}
 		err = ion.Unmarshal(resp.GetCurrentData(), &decoded)
@@ -62,7 +62,7 @@ func (repo *repository) addTransaction(txn qldbdriver.Transaction, transact tran
 }
 
 func (repo *repository) updateMetadataId(txn qldbdriver.Transaction, documentId interface{}, transactionId string) error {
-	_, err := txn.Execute("UPDATE WalletTransaction SET metadataID = ? WHERE id = ?", documentId, transactionId)
+	_, err := txn.Execute("UPDATE Transactions SET metadataID = ? WHERE id = ?", documentId, transactionId)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (repo *repository) updateMetadataId(txn qldbdriver.Transaction, documentId 
 }
 
 func (repo *repository) checkIfThereIsTransactionByTrackingId(txn qldbdriver.Transaction, trackingId string)(string, error)  {
-	result, err := txn.Execute("SELECT * FROM WalletTransaction WHERE trackingID = ?", trackingId)
+	result, err := txn.Execute("SELECT * FROM Transactions WHERE trackingID = ?", trackingId)
 
 	if err != nil {
 		return "", err
@@ -82,7 +82,7 @@ func (repo *repository) checkIfThereIsTransactionByTrackingId(txn qldbdriver.Tra
 		if err != nil {
 			return "", err
 		}
-		return temp.ID, nil
+		return temp.Id, nil
 	}
 	return "", err
 }

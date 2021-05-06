@@ -2,16 +2,16 @@ package grpc
 
 import (
 	"context"
+	"github.com/amzn/ion-go/ion"
 	"github.com/go-kit/kit/log"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"github.com/juniortads/kuiper-wallet/services/transaction"
 	"github.com/juniortads/kuiper-wallet/services/transaction/transport"
 	"github.com/juniortads/kuiper-wallet/services/transaction/transport/pb"
+	"github.com/shopspring/decimal"
 	oldcontext "golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"github.com/amzn/ion-go/ion"
-	"github.com/shopspring/decimal"
 )
 type grpcServer struct {
 	createTransaction kitgrpc.Handler
@@ -24,7 +24,7 @@ func NewGRPCServer(
 ) pb.TransactionServer {
 	return &grpcServer{
 		createTransaction: kitgrpc.NewServer(
-			endpoints.CreateTransaction, decodeCreateCustomerRequest, encodeCreateCustomerResponse, options...,
+			endpoints.CreateTransaction, decodeCreateTransactionRequest, encodeCreateTransactionResponse, options...,
 		),
 		logger: logger,
 	}
@@ -38,7 +38,7 @@ func (s *grpcServer) CreateTransaction(ctx oldcontext.Context, req *pb.CreateTra
 	return rep.(*pb.CreateTransactionResponse), nil
 }
 
-func decodeCreateCustomerRequest(_ context.Context, request interface{}) (interface{}, error) {
+func decodeCreateTransactionRequest(_ context.Context, request interface{}) (interface{}, error) {
 	req := request.(*pb.CreateTransactionRequest)
 
 	_, err := decimal.NewFromString(req.TransactionValue.Amount)
@@ -49,20 +49,20 @@ func decodeCreateCustomerRequest(_ context.Context, request interface{}) (interf
 
 	return transport.CreateTransactionRequest{
 		Transaction: transaction.Transaction{
-			ID:               req.Id,
 			Notes:            req.Notes,
 			TransactionValue: transaction.Value{
 				Currency: req.TransactionValue.Currency,
 				Amount: ion.MustParseDecimal(req.TransactionValue.Amount),
 			},
-			AccountID:        req.AccountId,
-			TrackingID:       req.TrackingId,
+			SourceAccountId: req.AccountId,
+			DestinationHolder: req.DestinationHolder.AccountId,
+			TrackingId:       req.TrackingId,
 			TransactionType:  req.TransactionType.String(),
 		},
 	}, nil
 }
 
-func encodeCreateCustomerResponse(_ context.Context, response interface{}) (interface{}, error) {
+func encodeCreateTransactionResponse(_ context.Context, response interface{}) (interface{}, error) {
 	res := response.(transport.CreateTransactionResponse)
 	err := getError(res.Err)
 	if err == nil {
