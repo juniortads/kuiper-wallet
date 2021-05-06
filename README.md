@@ -14,9 +14,9 @@ This app is aimed at providing a complete processing to financial ledger applica
 
 
 
-# What can you do with that?
+## What can you do with that?
 
-> Kuiper as a transaction wallet: A composable treatment.
+Kuiper as a transaction wallet with composable treatment.
 
 ![wallet-idea](images/wallet-idea.png)
 
