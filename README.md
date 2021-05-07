@@ -2,7 +2,7 @@
 
 <hr>
 
-## Kuiper Wallet
+# Kuiper Wallet
 
 This app is aimed at providing a complete processing to financial ledger application.
 
