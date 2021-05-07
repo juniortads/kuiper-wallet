@@ -2,8 +2,6 @@
 
 <hr>
 
-
-
 ## Kuiper Wallet
 
 This app is aimed at providing a complete processing to financial ledger application.
@@ -12,11 +10,8 @@ This app is aimed at providing a complete processing to financial ledger applica
 
 ![wallet](images/wallet.png)
 
-
-
-## What can you do with that?
+## Immutable, scalable, and easy to use
 
 Kuiper as a transaction wallet with composable treatment.
 
 ![wallet-idea](images/wallet-idea.png)
-
