@@ -43,7 +43,7 @@ func main()  {
 	qldbSession := qldbsession.New(awsSession)
 
 	driver, err := qldbdriver.New(
-		"kuiper-wallet",
+		"kuiper",
 		qldbSession,
 		func(options *qldbdriver.DriverOptions) {
 			options.LoggerVerbosity = qldbdriver.LogInfo

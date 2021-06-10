@@ -19,6 +19,13 @@ type Transaction struct {
 	CreationDateTime     time.Time `ion:"CreationDateTime" type:"timestamp"`
 }
 
+type AvailableBalance struct {
+	Balance    *ion.Decimal `ion:"Balance"`
+	AccountId  string       `ion:"AccountId"`
+	Currency   string       `ion:"Currency"`
+	MetadataId string       `ion:"MetadataId"`
+}
+
 type Value struct {
 	Currency string `ion:"Currency"`
 	Amount *ion.Decimal `ion:"Amount"`

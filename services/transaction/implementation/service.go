@@ -23,7 +23,7 @@ func NewService(rep transaction.Repository, logger log.Logger) *service {
 
 func (s *service) CreateTransaction(ctx context.Context, transaction transaction.Transaction) (string, error) {
 	logger := log.With(s.logger, "method", "CreateTransaction")
-	transaction.ID = ksuid.New().String()
+	transaction.Id = ksuid.New().String()
 	transaction.CreationDateTime = time.Now()
 
 	resp, err := s.repository.CreateTransaction(ctx, transaction)

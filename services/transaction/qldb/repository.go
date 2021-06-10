@@ -2,6 +2,7 @@ package qldb
 
 import (
 	"context"
+	"errors"
 	"github.com/amzn/ion-go/ion"
 	"github.com/awslabs/amazon-qldb-driver-go/qldbdriver"
 	"github.com/go-kit/kit/log"
@@ -29,15 +30,22 @@ func (repo *repository) CreateTransaction(ctx context.Context, transact transact
 		if result != "" {
 			return result, nil
 		} else {
-			resp, err := repo.addTransaction(txn, transact)
+			result, err := repo.checkIfThereIsBalanceAvailable(txn, transact.SourceAccountId,transact.TransactionValue.Amount)
 			if err != nil {
 				return nil, err
 			}
-			err = repo.updateMetadataId(txn, resp, transact.Id)
-			if err != nil {
-				return nil, err
+			if result {
+				resp, err := repo.addTransaction(txn, transact)
+				if err != nil {
+					return nil, err
+				}
+				err = repo.updateMetadataId(txn, resp, transact.Id)
+				if err != nil {
+					return nil, err
+				}
+				return transact.Id, nil
 			}
-			return transact.Id, nil
+			return nil, errors.New("insufficient balance")
 		}
 	})
 
@@ -62,7 +70,7 @@ func (repo *repository) addTransaction(txn qldbdriver.Transaction, transact tran
 }
 
 func (repo *repository) updateMetadataId(txn qldbdriver.Transaction, documentId interface{}, transactionId string) error {
-	_, err := txn.Execute("UPDATE Transactions SET metadataID = ? WHERE id = ?", documentId, transactionId)
+	_, err := txn.Execute("UPDATE Transactions SET MetadataID = ? WHERE Id = ?", documentId, transactionId)
 	if err != nil {
 		return err
 	}
@@ -70,7 +78,7 @@ func (repo *repository) updateMetadataId(txn qldbdriver.Transaction, documentId 
 }
 
 func (repo *repository) checkIfThereIsTransactionByTrackingId(txn qldbdriver.Transaction, trackingId string)(string, error)  {
-	result, err := txn.Execute("SELECT * FROM Transactions WHERE trackingID = ?", trackingId)
+	result, err := txn.Execute("SELECT * FROM Transactions WHERE TrackingID = ?", trackingId)
 
 	if err != nil {
 		return "", err
@@ -85,4 +93,26 @@ func (repo *repository) checkIfThereIsTransactionByTrackingId(txn qldbdriver.Tra
 		return temp.Id, nil
 	}
 	return "", err
+}
+
+func (repo *repository) checkIfThereIsBalanceAvailable(txn qldbdriver.Transaction, accountId string, transactionValue *ion.Decimal)(bool, error)  {
+	result, err := txn.Execute("SELECT Balance FROM AvailableBalance WHERE AccountId = ?", accountId)
+
+	if err != nil {
+		return false, err
+	}
+	if result.Next(txn) {
+		ionBinary := result.GetCurrentData()
+		temp := new(transaction.AvailableBalance)
+		err = ion.Unmarshal(ionBinary, temp)
+		if err != nil {
+			return false, err
+		}
+		result := temp.Balance.Cmp(transactionValue)
+
+		if result == 1 || result == 0 {
+			return true, nil
+		}
+	}
+	return false, err
 }
